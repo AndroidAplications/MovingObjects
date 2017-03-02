@@ -20,6 +20,10 @@ public class TouchActivity extends Activity {
     private int xDelta;
     private int yDelta;
 
+    private boolean updateCoord = true;
+    private int _x;
+    private int _y;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,15 +43,21 @@ public class TouchActivity extends Activity {
 
                 final int x = (int) event.getRawX();
                 final int y = (int) event.getRawY();
-                Log.i("onTouchListener", "Coordinates: ")
+                if (updateCoord){
+                    _x = x;
+                    _y = y;
+                    updateCoord = !updateCoord;
+                }
+                /*
+                Log.i("onTouchListener", "Coordinates: ");
                 Log.i("onTouchListener", "x: " + x);
                 Log.i("onTouchListener", "y: " + y);
+                */
                 switch (event.getAction() & MotionEvent.ACTION_MASK) {
 
                     case MotionEvent.ACTION_DOWN:
                         //Log.i("ACTION_DOWN", "In ACTION_DOWN");
-                        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams)
-                                view.getLayoutParams();
+                        RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
 
                         xDelta = x - lParams.leftMargin;
                         yDelta = y - lParams.topMargin;
@@ -60,17 +70,29 @@ public class TouchActivity extends Activity {
                         Toast.makeText(TouchActivity.this,
                                 "Everybody love Pablo!", Toast.LENGTH_SHORT)
                                 .show();
+
+                        mainLayout = (RelativeLayout) findViewById(R.id.main);
+                        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                        params.leftMargin = _x;
+                        params.topMargin = _y;
+                        ImageView myImage = new ImageView(getApplicationContext());
+                        myImage.setImageResource(R.mipmap.ic_launcher);
+                        myImage.setOnTouchListener(onTouchListener());
+                        mainLayout.addView(myImage, params);
+
+                        updateCoord = !updateCoord;
                         break;
 
                     case MotionEvent.ACTION_MOVE:
                         //Log.i("ACTION_MOVE", "In ACTION_MOVE");
-                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) view
-                                .getLayoutParams();
+                        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
                         layoutParams.leftMargin = x - xDelta;
                         layoutParams.topMargin = y - yDelta;
                         layoutParams.rightMargin = 0;
                         layoutParams.bottomMargin = 0;
                         view.setLayoutParams(layoutParams);
+
+                        /**/
                         break;
                 }
                 mainLayout.invalidate();
